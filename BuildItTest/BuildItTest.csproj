@@ -50,8 +50,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Builds\RiverTest.cs" />
+    <Compile Include="Extensions\BetweenTest.cs" />
+    <Compile Include="Builds\AirlineTest.cs" />
+    <Compile Include="Extensions\NumTest.cs" />
     <Compile Include="Geo\GeoToolsTest.cs" />
-    <Compile Include="Geo\GeoDataTest.cs" />
+    <Compile Include="Builds\HighwayTest.cs" />
     <Compile Include="Osm\OverpassTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnittestTools.cs" />
@@ -70,6 +74,11 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\testrailway.xml" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Resources\prefabs.txt" />
+    <EmbeddedResource Include="Resources\testriver.xml" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

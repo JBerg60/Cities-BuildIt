@@ -51,13 +51,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\BuildRoad.cs" />
-    <Compile Include="Geo\ActionQueue.cs" />
+    <Compile Include="Builds\OsmTrackCollection.cs" />
+    <Compile Include="Builds\River.cs" />
+    <Compile Include="Extensions\Between.cs" />
     <Compile Include="BuildTool.cs" />
-    <Compile Include="Geo\GeoData.cs" />
+    <Compile Include="Builds\Airline.cs" />
+    <Compile Include="Builds\Highway.cs" />
+    <Compile Include="Extensions\Num.cs" />
     <Compile Include="Geo\GeoTools.cs" />
-    <Compile Include="Geo\Node.cs" />
-    <Compile Include="Geo\Track.cs" />
+    <Compile Include="Builds\Node.cs" />
+    <Compile Include="Builds\Track.cs" />
+    <Compile Include="Builds\TrackCollection.cs" />
     <Compile Include="Gui\CustomCheckbox.cs" />
     <Compile Include="Gui\GuiBuilder.cs" />
     <Compile Include="Gui\MainPanel.cs" />

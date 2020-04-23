@@ -21,7 +21,16 @@ namespace BuildIt.Osm
         public int Timeout { get; set; } = 15;
 
         public const string Highway = "[highway=motorway]";
+        public const string Primary = "[highway=primary]";
+        public const string Secondary = "[highway=secondary]";
+        public const string Tertiary = "[highway=tertiary]";
+        public const string Residential = "[highway=residential]";
+
         public const string Railway = "[railway=rail][electrified=contact_line]";
+
+        public const string River = "[waterway=river]";
+        public const string Stream = "[waterway=stream]";
+        public const string Canal = "[waterway=canal]";
 
         public List<Node> Nodes { get; } = new List<Node>();
         public List<Segment> Segments { get; } = new List<Segment>();
@@ -40,7 +49,6 @@ namespace BuildIt.Osm
             try
             {
                 Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-
                 string query = $@"
                     [out:{Format}][timeout:{Timeout}];
                     way{filter}({leftTopLat},{leftTopLon},{rightBottomLat},{rightBottomLon});
@@ -65,40 +73,50 @@ namespace BuildIt.Osm
             Nodes.Clear();
             Segments.Clear();
 
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(xml);
-
-            XmlNodeList xmlNodeList;
-            xmlNodeList = doc.SelectNodes("/osm/node");
-            foreach(XmlNode xmlNode in xmlNodeList)
+            var saveCulture = Thread.CurrentThread.CurrentCulture;
+            try
             {
-                Nodes.Add(new Node()
-                {
-                    Id = Convert.ToInt64(xmlNode.Attributes["id"].Value),
-                    Lat = Convert.ToDouble(xmlNode.Attributes["lat"].Value),
-                    Lon = Convert.ToDouble(xmlNode.Attributes["lon"].Value)
-                });
-            }
+                Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
-            xmlNodeList = doc.SelectNodes("/osm/way");
-            Segment segment;
-            foreach (XmlNode xmlNode in xmlNodeList)
-            {
-                segment = new Segment()
-                {
-                    Id = Convert.ToInt64(xmlNode.Attributes["id"].Value)
-                };
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(xml);
 
-                foreach(XmlNode n in xmlNode.ChildNodes)
+                XmlNodeList xmlNodeList;
+                xmlNodeList = doc.SelectNodes("/osm/node");
+                foreach (XmlNode xmlNode in xmlNodeList)
                 {
-                    if (n.Name == "tag")
-                        segment.Tags.Add(n.Attributes["k"].Value, n.Attributes["v"].Value);
-
-                    if (n.Name == "nd")
-                        segment.Nodes.Add(Nodes.FirstOrDefault(nd => nd.Id == Convert.ToInt64(n.Attributes["ref"].Value)));
+                    Nodes.Add(new Node()
+                    {
+                        Id = Convert.ToInt64(xmlNode.Attributes["id"].Value),
+                        Lat = Convert.ToDouble(xmlNode.Attributes["lat"].Value),
+                        Lon = Convert.ToDouble(xmlNode.Attributes["lon"].Value)
+                    });
                 }
-                Segments.Add(segment);
+
+                xmlNodeList = doc.SelectNodes("/osm/way");
+                Segment segment;
+                foreach (XmlNode xmlNode in xmlNodeList)
+                {
+                    segment = new Segment()
+                    {
+                        Id = Convert.ToInt64(xmlNode.Attributes["id"].Value)
+                    };
+
+                    foreach (XmlNode n in xmlNode.ChildNodes)
+                    {
+                        if (n.Name == "tag")
+                            segment.Tags.Add(n.Attributes["k"].Value, n.Attributes["v"].Value);
+
+                        if (n.Name == "nd")
+                            segment.Nodes.Add(Nodes.FirstOrDefault(nd => nd.Id == Convert.ToInt64(n.Attributes["ref"].Value)));
+                    }
+                    Segments.Add(segment);
+                }
             }
-        }        
+            finally
+            {
+                Thread.CurrentThread.CurrentCulture = saveCulture;
+            }
+        }
     }
 }

@@ -46,5 +46,30 @@ namespace BuildIt.Osm
         public List<Node> Nodes { get; } = new List<Node>();
 
         public Dictionary<string, string> Tags { get; } = new Dictionary<string, string>();
+        public int Lanes 
+        { 
+            get
+            {
+                int result = 0;
+                if(Tags.ContainsKey("lanes") && int.TryParse(Tags["lanes"], out result))
+                    return result;
+                return 1;
+            }
+        }
+
+        public bool IsTunnel 
+        { 
+            get
+            {
+                return Tags.ContainsKey("tunnel") && Tags["tunnel"] == "yes";
+            }
+        }
+        public bool IsBridge
+        {
+            get
+            {
+                return Tags.ContainsKey("bridge") && Tags["bridge"] == "yes";
+            }
+        }
     }
 }

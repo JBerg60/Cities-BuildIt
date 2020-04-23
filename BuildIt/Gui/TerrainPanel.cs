@@ -1,56 +1,77 @@
-﻿using BuildIt.Geo;
+﻿using BuildIt.Builds;
 using ColossalFramework.UI;
+using System.IO;
 using UnityEngine;
 
 namespace BuildIt.Gui
 {
     public class TerrainPanel : UIPanel
     {
-        private UIButton okButton;
-        private UIButton flatButton;
-        private UIButton testButton;
+        private UIButton buildButton;
+        private UIButton dumpButton;
+        //private UIButton testButton;
 
         // Bunde, Limburg NL
-        const double lat = 50.90111;
-        const double lon = 5.73407;
+        private const double lat = 50.90111;
+
+        private const double lon = 5.73407;
 
         public override void OnDestroy()
         {
-            Destroy(okButton);
-            Destroy(flatButton);
-            Destroy(testButton);
+            Destroy(buildButton);
+            Destroy(dumpButton);
+            //Destroy(testButton);
         }
 
         public override void Start()
         {
-            okButton = UIHelper.MakeButton(this, "Generate Terrain", 10, 210, 135);
-            okButton.eventClick += OkButtonClick;
+            buildButton = UIHelper.MakeButton(this, "Build It", 10, 210, 135);
+            buildButton.eventClick += BuildButtonClick;
 
-            flatButton = UIHelper.MakeButton(this, "Flatten", 155, 210, 70);
-            flatButton.eventClick += FlattenButtonClick;
+            dumpButton = UIHelper.MakeButton(this, "Dump info", 145, 210, 135);
+            dumpButton.eventClick += DumpButtonClick;
 
-            testButton = UIHelper.MakeButton(this, "Highways", 225, 210, 50);
-            testButton.eventClick += HighwaysButtonClick;
+            //testButton = UIHelper.MakeButton(this, "Highways", 225, 210, 50);
+            //testButton.eventClick += HighwaysButtonClick;
         }
 
-        private void OkButtonClick(UIComponent component, UIMouseEventParameter eventParam)
+        private void BuildButtonClick(UIComponent component, UIMouseEventParameter eventParam)
         {
-            //Model.TerrainTool.instance.Generate((int)Mathf.Pow(2.0f, smoothness), scale, offset, (int)Mathf.Pow(2.0f, blur) + 1);
-        }
+            Debug.Log("Starting build");
 
-        private void FlattenButtonClick(UIComponent component, UIMouseEventParameter eventParam)
-        {
-            //Model.TerrainTool.instance.Flatten();
-        }
+            // generate Airplane line, north / south
+            Airline airline = new Airline(lat, lon);
+            airline.Build();
+            foreach (Track track in airline.Tracks)
+            {
+                foreach (Node node in track.Nodes)
+                {
+                    //BuildTool.instance.ActionQueue.Enqueue(node);
+                }
+            }
+            Debug.Log("Airline generated");
 
-        private void HighwaysButtonClick(UIComponent component, UIMouseEventParameter eventParam)
-        {
-            GeoData geoData = new GeoData(lat, lon);
-            int unresolved = geoData.GetHighways();
+            River river = new River(lat, lon);
+            int unresolved = river.Build();
 
-            Debug.Log($"OSM highways fetched, {unresolved} segments ignored!");
+            Debug.Log($"OSM rivers fetched, {river.Tracks.Count} tracks,  {unresolved} unresolved segments!");
+            
+            foreach (Track track in river.Tracks)
+            {
+                foreach (Node node in track.Nodes)
+                {
+                    Vector3 pos = new Vector3(node.MapX, 0, node.MapY);
+                    node.TerrainHeight = TerrainManager.instance.SampleRawHeightSmooth(pos);
+                    BuildTool.instance.ActionQueue.Enqueue(node);
+                }
+            }
 
-            foreach(Track track in geoData.Tracks)
+            Highway highway = new Highway(lat, lon);
+            unresolved = highway.Build();
+
+            Debug.Log($"OSM highways fetched, {highway.Tracks.Count} tracks, {unresolved} unresolved segments!");
+
+            foreach (Track track in highway.Tracks)
             {
                 foreach (Node node in track.Nodes)
                 {
@@ -58,5 +79,20 @@ namespace BuildIt.Gui
                 }
             }
         }
+
+        private void DumpButtonClick(UIComponent component, UIMouseEventParameter eventParam)
+        {
+            using (StreamWriter writer = new StreamWriter(@"D:\Downloads\prefabs.txt", false))
+            {
+                for (uint i = 0; i < PrefabCollection<NetInfo>.LoadedCount(); i++)
+                {
+                    writer.WriteLine($"nr: {i} => {PrefabCollection<NetInfo>.GetLoaded(i).name}");
+                }
+            }
+        }
+
+        //private void HighwaysButtonClick(UIComponent component, UIMouseEventParameter eventParam)
+        //{
+        //}
     }
 }

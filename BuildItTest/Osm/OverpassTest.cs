@@ -41,9 +41,16 @@ namespace BuildItTest.Osm
             Assert.AreEqual(1325, overpass.Nodes.Count);
             Assert.AreEqual(285, overpass.Segments.Count);
             Assert.AreEqual("A2", overpass.Segments[0].Name);
+            Assert.AreEqual("A2", overpass.Segments[0].Ref);
             Assert.AreEqual(4842325, overpass.Segments[0].Id);
             Assert.AreEqual(2, overpass.Segments[0].Nodes.Count);
             Assert.AreEqual(10, overpass.Segments[0].Tags.Count);
+
+            Segment segment = overpass.Segments.FirstOrDefault(s => s.Id == 329098539);
+            Assert.IsNotNull(segment);
+            Assert.AreEqual(11, segment.Tags.Count);
+            Assert.AreEqual("A2", segment.Ref);
+            Assert.AreEqual("Koning Willem-Alexandertunnel", segment.Name);
         }
     }
 }
