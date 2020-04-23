@@ -1,4 +1,5 @@
 using ColossalFramework.UI;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace BuildIt.Gui
@@ -109,6 +110,35 @@ namespace BuildIt.Gui
             return slider;
         }
 
+        public static UITextField MakeTextField(UIPanel panel, string text, float y)
+        {
+            UILabel label = panel.AddUIComponent<UILabel>();
+
+            label.name = text + "Label";
+            label.text = text;
+            label.relativePosition = new Vector3(15.0f, y);
+
+            UITextField textField = panel.AddUIComponent<UITextField>();
+
+            textField.atlas = GetAtlas("Ingame");
+            textField.size = new Vector2(90f, 20f);
+            textField.padding = new RectOffset(6, 6, 3, 3);
+            textField.relativePosition = new Vector3(60.0f, y);
+            textField.builtinKeyNavigation = true;
+            textField.isInteractive = true;
+            textField.readOnly = false;
+            textField.horizontalAlignment = UIHorizontalAlignment.Center;
+            textField.selectionSprite = "EmptySprite";
+            textField.selectionBackgroundColor = new Color32(0, 172, 234, 255);
+            textField.normalBgSprite = "TextFieldPanelHovered";
+            textField.disabledBgSprite = "TextFieldPanelHovered";
+            textField.textColor = new Color32(0, 0, 0, 255);
+            textField.disabledTextColor = new Color32(80, 80, 80, 128);
+            textField.color = new Color32(255, 255, 255, 255);
+
+            return textField;
+        }
+
         public static UIDropDown MakeDropDown(UIPanel panel, float y, string txt, string[] items, ColossalFramework.UI.PropertyChangedEventHandler<int> eventClick)
         {
             UILabel label = panel.AddUIComponent<UILabel>();
@@ -152,6 +182,25 @@ namespace BuildIt.Gui
 
             dd.eventSelectedIndexChanged += eventClick;
             return dd;
+        }
+
+        private static Dictionary<string, UITextureAtlas> atlases;
+
+        public static UITextureAtlas GetAtlas(string name)
+        {
+            if (atlases == null)
+            {
+                UIHelper.atlases = new Dictionary<string, UITextureAtlas>();
+
+                UITextureAtlas[] atlases = Resources.FindObjectsOfTypeAll(typeof(UITextureAtlas)) as UITextureAtlas[];
+                for (int i = 0; i < atlases.Length; i++)
+                {
+                    if (!UIHelper.atlases.ContainsKey(atlases[i].name))
+                        UIHelper.atlases.Add(atlases[i].name, atlases[i]);
+                }
+            }
+
+            return atlases[name];
         }
     }
 }

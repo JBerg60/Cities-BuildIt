@@ -34,6 +34,9 @@ namespace BuildIt
                 Debug.Log($"InstallMod with existing instance!");
             }
 
+            Builder.instance = new Builder();
+            Builder.instance.Init();
+
             GuiBuilder.instance = new GuiBuilder();
             GuiBuilder.instance.CreateUI();
 
@@ -44,6 +47,7 @@ namespace BuildIt
 
         private void UninstallMod()
         {
+            Builder.instance.Stop();
             GuiBuilder.instance.DestroyUI();
 
             if (BuildTool.instance != null)

@@ -51,6 +51,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Builder.cs" />
     <Compile Include="Builds\Canal.cs" />
     <Compile Include="Builds\OsmTrackCollection.cs" />
     <Compile Include="Builds\River.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Osm\Node.cs" />
     <Compile Include="Osm\Overpass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Threader.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

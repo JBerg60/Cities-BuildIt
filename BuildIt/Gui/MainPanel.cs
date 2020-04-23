@@ -13,50 +13,43 @@
 //
 
 using ColossalFramework.UI;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 namespace BuildIt.Gui
 {
     public class MainPanel : UIPanel
     {
+        // Bunde, Limburg NL
+        private const double lat = 50.90111;
+        private const double lon = 5.73407;
+
         private UILabel title;
         private UIDragHandle dragHandle;
-        private UITabContainer tabContainer;
-        private TerrainPanel terrainPanel;
-        //private ResourcePanel resPanel;
-        //private TreePanel treePanel;
-        private UITabstrip tabStrip;
         private UIButton closeButton;
-
-        private List<UIButton> tabs;
+        private UITextField latTextField;
+        private UITextField lonTextField;
+        private UILabel status;
+        private UIButton buildButton;
 
         public override void Awake()
         {
             title = AddUIComponent<UILabel>();
             dragHandle = AddUIComponent<UIDragHandle>();
-            tabStrip = AddUIComponent<UITabstrip>();
-            tabContainer = AddUIComponent<UITabContainer>();
             closeButton = AddUIComponent<UIButton>();
-
-            terrainPanel = tabContainer.AddUIComponent<TerrainPanel>();
-            //resPanel = tabContainer.AddUIComponent<ResourcePanel>();
-            //treePanel = tabContainer.AddUIComponent<TreePanel>();
+            buildButton = AddUIComponent<UIButton>();
+            latTextField = AddUIComponent<UITextField>();
+            lonTextField = AddUIComponent<UITextField>();
+            status = AddUIComponent<UILabel>();
         }
 
         public override void OnDestroy()
         {
-            foreach (UIButton tab in tabs)
-            {
-                Destroy(tab);
-            }
-
-            //Destroy(treePanel);
-            //Destroy(resPanel);
-            Destroy(terrainPanel);
+            Destroy(status);
+            Destroy(latTextField);
+            Destroy(lonTextField);
+            Destroy(buildButton);
             Destroy(closeButton);
-            Destroy(tabContainer);
-            Destroy(tabStrip);
             Destroy(dragHandle);
             Destroy(title);
         }
@@ -67,7 +60,7 @@ namespace BuildIt.Gui
             width = 280;
             height = 330;
 
-            title.text = "Terrain Tools";
+            title.text = "Build It";
             title.relativePosition = new Vector3(15, 15);
             title.textScale = 0.9f;
             title.size = new Vector2(200, 30);
@@ -86,69 +79,40 @@ namespace BuildIt.Gui
             closeButton.hoveredColor = new Color(1, 1, 1, .75f);
             closeButton.eventClick += closeButton_eventClick;
 
-            tabContainer.relativePosition = new Vector3(0, 84);
-            tabContainer.width = width;
-            tabContainer.backgroundSprite = "GenericPanel";
-            tabContainer.color = new Color(.4f, .4f, .4f, 1.0f);
+            latTextField = UIHelper.MakeTextField(this, "Lat:", 60);
+            latTextField.text = lat.ToString("N6");
 
-            tabStrip.width = width - 20;
-            tabStrip.height = 18;
-            tabStrip.relativePosition = new Vector3(10, 50);
-            tabStrip.startSelectedIndex = 0;
-            tabStrip.selectedIndex = -1;
+            lonTextField = UIHelper.MakeTextField(this, "Lon:", 90);
+            lonTextField.text = lon.ToString("N6");
 
-            tabs = new List<UIButton>();
-            tabs.Add(UIHelper.MakeTab(tabStrip, "Terrain", 54, terrainPanel, baseTabButton_eventClick));
-            //tabs.Add(UIHelper.MakeTab(tabStrip, "Resources", 74, resPanel, baseTabButton_eventClick));
-            //tabs.Add(UIHelper.MakeTab(tabStrip, "Trees", 54, treePanel, baseTabButton_eventClick));
+            status.text = "";
+            status.relativePosition = new Vector3(15, 260);
+            status.textScale = 0.9f;
+            status.size = new Vector2(200, 30);
 
-            //resPanel.Hide();
-            //treePanel.Hide();
-            terrainPanel.Show();
+            buildButton = UIHelper.MakeButton(this, "Go", 10, 290, 60);
+            buildButton.enabled = !Builder.instance.IsRunning;
+            buildButton.eventClick += BuildButtonClick;
+
+            Builder.instance.OnUpdate += BuilderOnUpdate;
         }
 
-        private void checkTabs()
+        private void BuilderOnUpdate(object sender, EventArgs e)
         {
-            if (tabs == null)
-                return;
-
-            foreach (UIButton tab in tabs)
-            {
-                if (((UIPanel)tab.objectUserData).isVisible == true && tab.name == "Resources")
-                {
-                    InfoManager.instance.SetCurrentMode(InfoManager.InfoMode.NaturalResources, InfoManager.SubInfoMode.Default);
-                    return;
-                }
-            }
-            InfoManager.instance.SetCurrentMode(InfoManager.InfoMode.None, InfoManager.SubInfoMode.Default);
+            status.text = Builder.instance.Status;
+            buildButton.enabled = !Builder.instance.IsRunning;
         }
 
-        protected override void OnVisibilityChanged()
-        {
-            base.OnVisibilityChanged();
-            checkTabs();
+        private void BuildButtonClick(UIComponent component, UIMouseEventParameter eventParam)
+        {            
+            Debug.Log("Go button click");
+            // TODO : set params from the Gui, lat/lon etc.
+            Builder.instance.Start();
         }
 
         private void closeButton_eventClick(UIComponent component, UIMouseEventParameter eventParam)
         {
             Hide();
-        }
-
-        private void baseTabButton_eventClick(UIComponent c, UIMouseEventParameter e)
-        {
-            foreach (UIButton tab in tabs)
-            {
-                UIPanel p = (UIPanel)tab.objectUserData;
-                if (tab.name == c.name)
-                {
-                    p.Show();
-                }
-                else
-                {
-                    p.Hide();
-                }
-            }
-            checkTabs();
         }
 
         public override void Update()
