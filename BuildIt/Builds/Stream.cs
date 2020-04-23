@@ -2,12 +2,12 @@
 
 namespace BuildIt.Builds
 {
-    public class River : OsmTrackCollection
-    {        
+    public class Stream : OsmTrackCollection
+    {
 
-        public River(double lat, double lon) : base(lat, lon)
+        public Stream(double lat, double lon) : base(lat, lon)
         {
-            
+
         }
 
         public override void PostProcess()
@@ -20,13 +20,13 @@ namespace BuildIt.Builds
             {
                 MapX = x,
                 MapY = y,
-                Elevation = -20,
-                Width = 160
+                Elevation = -10,
+                Width = 60
             };
         }
 
-        protected override string Query => Overpass.River;
+        protected override string Query => Overpass.Stream;
 
         protected override Tracktype Tracktype => Tracktype.Water;
-    }
+    }        
 }

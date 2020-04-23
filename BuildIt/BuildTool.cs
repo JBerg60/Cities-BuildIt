@@ -177,7 +177,7 @@ namespace BuildIt
         private void ModifyTerrain(Vector3 startPos, Vector3 endPos, Node currentNode)
         {
             // for watecap = 20 we need radius 100 and depth 50 (= very large river)
-            const int radius = 80; // width is twice the radius
+            int radius = currentNode.Width / 2; // width is twice the radius
 
             int dist = (int)Vector3.Distance(startPos, endPos);
 

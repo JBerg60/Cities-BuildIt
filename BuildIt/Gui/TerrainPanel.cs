@@ -51,8 +51,38 @@ namespace BuildIt.Gui
             }
             Debug.Log("Airline generated");
 
+            Builds.Stream stream = new Builds.Stream(lat, lon);
+            int unresolved = stream.Build();
+
+            Debug.Log($"OSM canals fetched, {stream.Tracks.Count} tracks,  {unresolved} unresolved segments!");
+
+            foreach (Track track in stream.Tracks)
+            {
+                foreach (Node node in track.Nodes)
+                {
+                    Vector3 pos = new Vector3(node.MapX, 0, node.MapY);
+                    node.TerrainHeight = TerrainManager.instance.SampleRawHeightSmooth(pos);
+                    BuildTool.instance.ActionQueue.Enqueue(node);
+                }
+            }
+
+            Canal canal = new Canal(lat, lon);
+            unresolved = canal.Build();
+
+            Debug.Log($"OSM canals fetched, {canal.Tracks.Count} tracks,  {unresolved} unresolved segments!");
+
+            foreach (Track track in canal.Tracks)
+            {
+                foreach (Node node in track.Nodes)
+                {
+                    Vector3 pos = new Vector3(node.MapX, 0, node.MapY);
+                    node.TerrainHeight = TerrainManager.instance.SampleRawHeightSmooth(pos);
+                    BuildTool.instance.ActionQueue.Enqueue(node);
+                }
+            }
+
             River river = new River(lat, lon);
-            int unresolved = river.Build();
+            unresolved = river.Build();
 
             Debug.Log($"OSM rivers fetched, {river.Tracks.Count} tracks,  {unresolved} unresolved segments!");
             
@@ -65,6 +95,7 @@ namespace BuildIt.Gui
                     BuildTool.instance.ActionQueue.Enqueue(node);
                 }
             }
+
 
             Highway highway = new Highway(lat, lon);
             unresolved = highway.Build();

@@ -51,8 +51,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Builds\Canal.cs" />
     <Compile Include="Builds\OsmTrackCollection.cs" />
     <Compile Include="Builds\River.cs" />
+    <Compile Include="Builds\Stream.cs" />
     <Compile Include="Extensions\Between.cs" />
     <Compile Include="BuildTool.cs" />
     <Compile Include="Builds\Airline.cs" />

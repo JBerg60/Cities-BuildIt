@@ -28,5 +28,6 @@
 
         public int Elevation { get; set; } = 0;
         public float TerrainHeight { get; set; }
+        public int Width { get; set; }
     }
 }
